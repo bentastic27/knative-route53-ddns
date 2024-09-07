@@ -19,32 +19,37 @@ ce_attributes = {
 }
 
 while(True):
-  list_resource_record_sets = r53client.list_resource_record_sets(
-    HostedZoneId=environ.get("HOSTED_ZONE_ID"),
-    StartRecordName=record_name,
-    StartRecordType="A",
-    MaxItems="300"
-  )
+  try:
+    list_resource_record_sets = r53client.list_resource_record_sets(
+      HostedZoneId=environ.get("HOSTED_ZONE_ID"),
+      StartRecordName=record_name,
+      StartRecordType="A",
+      MaxItems="300"
+    )
 
-  filtered = list(filter(
-    lambda d: d["Name"] == record_name and d["Type"] == "A",
-    list_resource_record_sets["ResourceRecordSets"]
-  ))
+    filtered = list(filter(
+      lambda d: d["Name"] == record_name and d["Type"] == "A",
+      list_resource_record_sets["ResourceRecordSets"]
+    ))
 
-  if len(filtered) > 0:
-    r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
-  else:
-    r53_ip = ""
+    if len(filtered) > 0:
+      r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
+    else:
+      r53_ip = ""
+    
+    wan_ip = get('https://api.ipify.org').content.decode('utf8')
+
+    if r53_ip != wan_ip:
+      print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} mismatch, sending event")
+      cd_data = {"r53_ip": r53_ip, "wan_ip": wan_ip}
+      event = CloudEvent(ce_attributes, cd_data)
+      headers, body = to_structured(event)
+      post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
+
+    else:
+      print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
   
-  wan_ip = get('https://api.ipify.org').content.decode('utf8')
-
-  if r53_ip != wan_ip:
-    print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} mismatch, sending event")
-    cd_data = {"r53_ip": r53_ip, "wan_ip": wan_ip}
-    event = CloudEvent(ce_attributes, cd_data)
-    headers, body = to_structured(event)
-    post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
-  else:
-    print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
+  except Exception as e:
+    print(e)
 
   sleep(int(environ.get("SLEEP_INTERVAL", "300")))
