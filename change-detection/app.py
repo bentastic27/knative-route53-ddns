@@ -23,7 +23,7 @@ while(True):
     list_resource_record_sets = r53client.list_resource_record_sets(
       HostedZoneId=environ.get("HOSTED_ZONE_ID"),
       StartRecordName=record_name,
-      StartRecordType="A",
+      StartRecordType=environ.get("RECORD_TYPE", "A"),
       MaxItems="300"
     )
 
@@ -41,7 +41,16 @@ while(True):
 
     if r53_ip != wan_ip:
       print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} mismatch, sending event")
-      cd_data = {"r53_ip": r53_ip, "wan_ip": wan_ip}
+
+      cd_data = {
+        "r53_ip": r53_ip,
+        "wan_ip": wan_ip,
+        "record_name": record_name,
+        "record_type": environ.get("RECORD_TYPE", "A"),
+        "hosted_zone_id": environ.get("HOSTED_ZONE_ID"),
+        "record_ttl": environ.get("RECORD_TTL", "300")
+      }
+
       event = CloudEvent(ce_attributes, cd_data)
       headers, body = to_structured(event)
       post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
