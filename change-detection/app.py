@@ -39,7 +39,7 @@ while(True):
     cd_data = {"r53_ip": r53_ip, "wan_ip": wan_ip}
     event = CloudEvent(ce_attributes, cd_data)
     headers, body = to_structured(event)
-    post(environ.get("K_SINK"), data=body, headers=headers)
+    post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
   else:
     print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
 
