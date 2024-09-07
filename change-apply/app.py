@@ -10,7 +10,7 @@ r53client = boto3.client('route53')
 
 
 @app.route("/", methods=["POST"])
-def home():
+def main():
   try:
     event = from_http(request.headers, request.get_data()).get_data()
 
@@ -35,6 +35,11 @@ def home():
   except Exception as e:
     print(e)
     return "", 500
+
+
+@app.route("/health", methods=["POST"])
+def health():
+  return "", 200
 
 
 if __name__ == "__main__":
