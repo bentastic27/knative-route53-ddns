@@ -1,0 +1,15 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: change-apply
+  namespace: knative-route53-ddns
+  labels:
+    networking.knative.dev/visibility: cluster-local
+spec:
+  template:
+    spec:
+      containers:
+        - image: bentastic27/knative-route53-ddns-apply:latest
+          ports:
+          - containerPort: 8080
+            protocol: TCP
