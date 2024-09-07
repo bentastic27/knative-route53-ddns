@@ -31,7 +31,11 @@ while(True):
     list_resource_record_sets["ResourceRecordSets"]
   ))
 
-  r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
+  if len(filtered) > 0:
+    r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
+  else:
+    r53_ip = ""
+  
   wan_ip = get('https://api.ipify.org').content.decode('utf8')
 
   if r53_ip != wan_ip:
