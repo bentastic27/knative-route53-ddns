@@ -4,11 +4,11 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - 'change-appl/**'
+      - 'change-apply/**'
   pull_request:
     branches: [ "main" ]
     paths:
-      - 'change-appl/**'
+      - 'change-apply/**'
 
 jobs:
   change-appl:
