@@ -11,4 +11,5 @@ RUN groupadd --gid 1000 appuser && \
 
 EXPOSE 8080
 
-ENTRYPOINT ["/usr/local/bin/python", "/app/app.py"]
+ENTRYPOINT ["gunicorn"]
+CMD ["app:app", "--access-logfile=-", "--log-file=-", "--bind=0.0.0.0:8080"]
