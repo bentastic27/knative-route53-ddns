@@ -12,6 +12,7 @@ spec:
         app: change-detection
   sink:
     ref:
-      apiVersion: serving.knative.dev/v1
+      apiVersion: eventing.knative.dev/v1
       kind: Broker
       name: knative-route53-ddns
+      namespace: knative-route53-ddns
