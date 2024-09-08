@@ -13,3 +13,13 @@ spec:
           ports:
           - containerPort: 8080
             protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: 8080
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: 8080
+            successThreshold: 1
+          resources: {}

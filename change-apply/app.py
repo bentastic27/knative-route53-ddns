@@ -37,7 +37,7 @@ def main():
     return "", 500
 
 
-@app.route("/health", methods=["POST"])
+@app.route("/health", methods=["GET"])
 def health():
   return "", 200
 
