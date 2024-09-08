@@ -19,8 +19,16 @@ ce_attributes = {
   "source": environ.get("CE_EVENT_SOURCE", "knative-route53-dns")
 }
 
+print(
+  environ.get("RECORD_NAME", "example.com."),
+  environ.get("HOSTED_ZONE_ID"),
+  environ.get("RECORD_TYPE", "A"),
+  environ.get("RECORD_TTL", "300")
+)
+
 while(True):
   try:
+    print("Requesting r53 record sets")
     list_resource_record_sets = r53client.list_resource_record_sets(
       HostedZoneId=environ.get("HOSTED_ZONE_ID"),
       StartRecordName=record_name,
