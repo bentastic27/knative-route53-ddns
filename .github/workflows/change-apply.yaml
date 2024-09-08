@@ -11,7 +11,7 @@ on:
       - 'change-apply/**'
 
 jobs:
-  change-appl:
+  change-apply:
     runs-on: ubuntu-latest
     steps:
       -
