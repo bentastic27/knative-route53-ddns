@@ -11,5 +11,7 @@ RUN groupadd --gid 1000 appuser && \
 
 EXPOSE 8080
 
+USER appuser
+
 ENTRYPOINT ["gunicorn"]
 CMD ["app:app", "--access-logfile=-", "--log-file=-", "--bind=0.0.0.0:8080"]
