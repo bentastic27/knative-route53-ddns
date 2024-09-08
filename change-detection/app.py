@@ -19,13 +19,19 @@ ce_attributes = {
 }
 
 while(True):
-
-  list_resource_record_sets = r53client.list_resource_record_sets(
-    HostedZoneId=environ.get("HOSTED_ZONE_ID"),
-    StartRecordName=record_name,
-    StartRecordType=environ.get("RECORD_TYPE", "A"),
-    MaxItems="300"
-  )
+  try:
+    list_resource_record_sets = r53client.list_resource_record_sets(
+      HostedZoneId=environ.get("HOSTED_ZONE_ID"),
+      StartRecordName=record_name,
+      StartRecordType=environ.get("RECORD_TYPE", "A"),
+      MaxItems="300"
+    )
+    if not list_resource_record_sets:
+      print("check your envs, r53 call returned nothing")
+      exit(1)
+  except Exception as e:
+    print(e)
+    exit(1)
 
   filtered = list(filter(
     lambda d: d["Name"] == record_name and d["Type"] == "A",
@@ -51,9 +57,13 @@ while(True):
       "record_ttl": environ.get("RECORD_TTL", "300")
     }
 
-    event = CloudEvent(ce_attributes, cd_data)
-    headers, body = to_structured(event)
-    post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
+    try:
+      event = CloudEvent(ce_attributes, cd_data)
+      headers, body = to_structured(event)
+      print(post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers).status_code)
+    except Exception as e:
+      print(e)
+      exit(1)
 
   else:
     print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
