@@ -5,7 +5,7 @@ metadata:
   namespace: knative-route53-ddns
 spec:
   broker: knative-route53-ddns
-  subcriber:
+  subscriber:
     ref:
       apiVersion: eventing.knative.dev/v1
       kind: Service
