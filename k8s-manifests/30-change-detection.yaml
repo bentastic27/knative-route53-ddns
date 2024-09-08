@@ -18,6 +18,11 @@ spec:
       containers:
       - name: change-detection
         image: bentastic27/knative-route53-ddns-detection:latest
+        envFrom:
+        - secretRef:
+            name: aws-creds
+        - configMapRef:
+            name: knative-route53-ddns
         resources:
           requests:
             cpu: 50m
