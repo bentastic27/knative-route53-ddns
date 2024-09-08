@@ -1,0 +1,17 @@
+apiVersion: sources.knative.dev/v1
+kind: SinkBinding
+metadata:
+  name: knative-route53-ddns
+  namespace: knative-route53-ddns
+spec:
+  subject:
+    apiVersion: apps/v1
+    kind: Deployment
+    selector:
+      matchLabels:
+        app: change-detection
+  sink:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: change-apply

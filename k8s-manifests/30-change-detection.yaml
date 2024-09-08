@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: change-detection
+  namespace: knative-route53-ddns
+  labels:
+    app: change-detection
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: change-detection
+  template:
+    metadata:
+      labels:
+        app: change-detection
+    spec:
+      containers:
+      - name: change-detection
+        image: bentastic27/knative-route53-ddns-detection:latest
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32M
+          limits:
+            cpu: 100m
+            memory: 64M

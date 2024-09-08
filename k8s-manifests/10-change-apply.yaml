@@ -15,11 +15,17 @@ spec:
             protocol: TCP
           livenessProbe:
             httpGet:
-              path: /health/liveness
+              path: /health
               port: 8080
           readinessProbe:
             httpGet:
-              path: /health/readiness
+              path: /health
               port: 8080
             successThreshold: 1
-          resources: {}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64M
+            limits:
+              cpu: 100m
+              memory: 128M
