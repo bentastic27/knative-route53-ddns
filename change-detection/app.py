@@ -19,46 +19,43 @@ ce_attributes = {
 }
 
 while(True):
-  try:
-    list_resource_record_sets = r53client.list_resource_record_sets(
-      HostedZoneId=environ.get("HOSTED_ZONE_ID"),
-      StartRecordName=record_name,
-      StartRecordType=environ.get("RECORD_TYPE", "A"),
-      MaxItems="300"
-    )
 
-    filtered = list(filter(
-      lambda d: d["Name"] == record_name and d["Type"] == "A",
-      list_resource_record_sets["ResourceRecordSets"]
-    ))
+  list_resource_record_sets = r53client.list_resource_record_sets(
+    HostedZoneId=environ.get("HOSTED_ZONE_ID"),
+    StartRecordName=record_name,
+    StartRecordType=environ.get("RECORD_TYPE", "A"),
+    MaxItems="300"
+  )
 
-    if len(filtered) > 0:
-      r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
-    else:
-      r53_ip = ""
-    
-    wan_ip = get('https://api.ipify.org').content.decode('utf8')
+  filtered = list(filter(
+    lambda d: d["Name"] == record_name and d["Type"] == "A",
+    list_resource_record_sets["ResourceRecordSets"]
+  ))
 
-    if r53_ip != wan_ip:
-      print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} mismatch, sending event")
-
-      cd_data = {
-        "r53_ip": r53_ip,
-        "wan_ip": wan_ip,
-        "record_name": record_name,
-        "record_type": environ.get("RECORD_TYPE", "A"),
-        "hosted_zone_id": environ.get("HOSTED_ZONE_ID"),
-        "record_ttl": environ.get("RECORD_TTL", "300")
-      }
-
-      event = CloudEvent(ce_attributes, cd_data)
-      headers, body = to_structured(event)
-      post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
-
-    else:
-      print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
+  if len(filtered) > 0:
+    r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
+  else:
+    r53_ip = ""
   
-  except Exception as e:
-    print(e)
+  wan_ip = get('https://api.ipify.org').content.decode('utf8')
+
+  if r53_ip != wan_ip:
+    print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} mismatch, sending event")
+
+    cd_data = {
+      "r53_ip": r53_ip,
+      "wan_ip": wan_ip,
+      "record_name": record_name,
+      "record_type": environ.get("RECORD_TYPE", "A"),
+      "hosted_zone_id": environ.get("HOSTED_ZONE_ID"),
+      "record_ttl": environ.get("RECORD_TTL", "300")
+    }
+
+    event = CloudEvent(ce_attributes, cd_data)
+    headers, body = to_structured(event)
+    post(environ.get("K_SINK", "http://localhost:8080/"), data=body, headers=headers)
+
+  else:
+    print(f"wan_ip: {wan_ip} r53_ip: {r53_ip} matched")
 
   sleep(int(environ.get("SLEEP_INTERVAL", "300")))
