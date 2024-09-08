@@ -13,5 +13,5 @@ spec:
   sink:
     ref:
       apiVersion: serving.knative.dev/v1
-      kind: Service
-      name: change-apply
+      kind: Broker
+      name: knative-route53-ddns

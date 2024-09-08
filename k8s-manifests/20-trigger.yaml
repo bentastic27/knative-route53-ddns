@@ -1,0 +1,13 @@
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: change-apply
+  namespace: knative-route53-ddns
+spec:
+  broker: knative-route53-ddns
+  subcriber:
+    ref:
+      apiVersion: eventing.knative.dev/v1
+      kind: Service
+      name: change-apply
+      namespace: knative-route53-ddns
