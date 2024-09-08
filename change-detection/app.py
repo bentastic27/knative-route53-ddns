@@ -1,5 +1,6 @@
 from os import environ
 from time import sleep
+from pprint import pprint
 
 import boto3
 from requests import get, post
@@ -38,6 +39,8 @@ while(True):
     list_resource_record_sets["ResourceRecordSets"]
   ))
 
+  pprint(filtered)
+
   if len(filtered) > 0:
     r53_ip = filtered[0]["ResourceRecords"][0]["Value"]
   else:
@@ -56,6 +59,8 @@ while(True):
       "hosted_zone_id": environ.get("HOSTED_ZONE_ID"),
       "record_ttl": environ.get("RECORD_TTL", "300")
     }
+
+    pprint(cd_data)
 
     try:
       event = CloudEvent(ce_attributes, cd_data)
