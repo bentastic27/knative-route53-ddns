@@ -1,4 +1,5 @@
 FROM python:3.12-slim
+ENV PYTHONUNBUFFERED=true
 WORKDIR /app
 COPY requirements.txt /app/
 COPY app.py /app/

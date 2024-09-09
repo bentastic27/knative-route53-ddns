@@ -7,6 +7,7 @@ from requests import get, post
 from cloudevents.conversion import to_structured
 from cloudevents.http import CloudEvent
 
+print("Building r53 client")
 r53client = boto3.client('route53')
 
 if not environ.get("RECORD_NAME", "example.com.").endswith("."):
