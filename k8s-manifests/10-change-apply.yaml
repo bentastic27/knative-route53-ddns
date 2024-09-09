@@ -1,34 +1,65 @@
-apiVersion: serving.knative.dev/v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: change-apply
   namespace: knative-route53-ddns
   labels:
-    networking.knative.dev/visibility: cluster-local
+    app: change-apply
 spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: change-apply
   template:
+    metadata:
+      labels:
+        app: change-apply
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       containers:
-        - image: bentastic27/knative-route53-ddns-apply:latest
-          ports:
-          - containerPort: 8080
-            protocol: TCP
-          envFrom:
-          - secretRef:
-              name: aws-creds
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 8080
-            successThreshold: 1
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64M
-            limits:
-              cpu: 100m
-              memory: 128M
+      - name: change-apply
+        image: bentastic27/knative-route53-ddns-apply:latest
+        envFrom:
+        - secretRef:
+            name: aws-creds
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /health
+            scheme: HTTP
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            scheme: HTTP
+            port: 8080
+          initialDelaySeconds: 3
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64M
+          limits:
+            cpu: 100m
+            memory: 128M
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: change-apply
+  namespace: knative-route53-ddns
+spec:
+  type: ClusterIP
+  selector:
+    app: change-apply
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+      name: http
