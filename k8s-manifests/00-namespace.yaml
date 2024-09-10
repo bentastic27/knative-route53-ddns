@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: knative-route53-ddns
   labels:
-    istio.io/dataplane-mode: ambient
+    istio-injection: enabled
