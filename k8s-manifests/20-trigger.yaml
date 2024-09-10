@@ -7,7 +7,7 @@ spec:
   broker: knative-route53-ddns
   subscriber:
     ref:
-      apiVersion: v1
+      apiVersion: serving.knative.dev/v1
       kind: Service
       name: change-apply
       namespace: knative-route53-ddns
